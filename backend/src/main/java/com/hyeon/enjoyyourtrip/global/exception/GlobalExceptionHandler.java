@@ -8,6 +8,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tomcat.util.http.InvalidParameterException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -54,6 +55,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ProblemDetail> handleBusiness(BusinessException e, HttpServletRequest request) {
         HttpStatus status = statusOf(e);
+        if (e instanceof ExternalServiceException) {
+            log.warn("외부 API 호출 실패: {}", e.getMessage(), e.getCause());
+        }
         return problem(status, e.getCode(), e.getMessage(), request);
     }
 
@@ -71,6 +75,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             return problem(HttpStatus.UNAUTHORIZED, "INVALID_TOKEN", "유효하지 않거나 만료된 토큰입니다.", request);
         }
         return problem(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "인증이 필요합니다.", request);
+    }
+
+    /** 쿼리 파라미터가 UTF-8로 인코딩되지 않아 Tomcat이 해석하지 못함 (예: CP949로 보낸 한글) */
+    @ExceptionHandler(InvalidParameterException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidParameter(InvalidParameterException e, HttpServletRequest request) {
+        return problem(HttpStatus.BAD_REQUEST, "INVALID_ENCODING", "요청 파라미터는 UTF-8로 인코딩해야 합니다.", request);
     }
 
     @ExceptionHandler(Exception.class)
@@ -127,6 +137,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             case UnauthorizedException ignored -> HttpStatus.UNAUTHORIZED;
             case ForbiddenException ignored -> HttpStatus.FORBIDDEN;
             case InvalidValueException ignored -> HttpStatus.BAD_REQUEST;
+            case ExternalServiceException ignored -> HttpStatus.BAD_GATEWAY;
             default -> HttpStatus.BAD_REQUEST;
         };
     }
