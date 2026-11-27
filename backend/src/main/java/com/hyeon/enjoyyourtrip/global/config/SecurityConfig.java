@@ -50,7 +50,8 @@ public class SecurityConfig {
     private static final String[] PUBLIC_GET_PATHS = {
             "/api/v1/auth/email-check",
             "/api/v1/posts",
-            "/api/v1/posts/*"
+            "/api/v1/posts/*",
+            "/api/v1/tours/**"
     };
 
     private final ProblemDetailAuthenticationEntryPoint authenticationEntryPoint;
