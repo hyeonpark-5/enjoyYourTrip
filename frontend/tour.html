@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관광지 찾기 | EnjoyTrip</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app.css">
+<script src="js/common/theme-init.js"></script>
+<script src="js/config.js"></script>
+<script type="module" src="js/pages/tour.js"></script>
+</head>
+<body data-page="tour">
+    <div id="site-header"></div>
+    <main id="main">
+        <div class="page-head">
+            <p class="eyebrow">EXPLORE KOREA</p>
+            <h1>관광지 찾기</h1>
+            <p>지역과 테마를 골라 국내 관광지를 지도에서 살펴보세요. 지도를 확대하거나 이동하면 주변 관광지를 다시 불러옵니다.</p>
+        </div>
+
+        <form class="search-panel tour-search" action="tour.html" method="get" aria-label="관광지 검색 조건">
+            <div class="field-group">
+                <label for="areaCode">지역</label>
+                <select id="areaCode" name="areaCode">
+                    <option value="all">전국</option>
+                </select>
+            </div>
+            <div class="field-group">
+                <label for="contentTypeId">테마</label>
+                <select id="contentTypeId" name="contentTypeId">
+                    <option value="all">전체 테마</option>
+                </select>
+            </div>
+            <div class="field-group search-field">
+                <label for="keyword">여행지 검색</label>
+                <input id="keyword" name="keyword" type="search" maxlength="30" placeholder="여행지명을 입력하세요" autocomplete="off" />
+            </div>
+            <button type="submit" class="search-button"><span aria-hidden="true">⌕</span>찾기</button>
+        </form>
+
+        <section class="explorer" aria-label="관광지 지도와 목록">
+            <aside class="place-panel" aria-labelledby="place-list-title">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">PLACES</p>
+                        <h2 id="place-list-title">추천 여행지</h2>
+                    </div>
+                    <span id="place-count" class="filter-chip" hidden></span>
+                </div>
+                <a id="region-overview-button" class="region-overview-button" href="tour.html" hidden>
+                    <span aria-hidden="true">←</span> 전국 지역 선택으로 돌아가기
+                </a>
+                <p id="data-status" class="data-status">지역을 선택하거나, 지도를 확대하면 현재 위치 주변 여행지를 불러옵니다.</p>
+                <div id="place-list" class="place-list"></div>
+                <div id="empty-state" class="empty-state" hidden>
+                    <span aria-hidden="true">⌖</span>
+                    <strong id="empty-title">어디로 떠나볼까요?</strong>
+                    <p id="empty-message">지역을 선택하거나 관광지명을 검색해보세요.</p>
+                </div>
+            </aside>
+
+            <div class="map-wrap">
+                <div id="map" aria-label="관광지 위치 지도"></div>
+                <div id="theme-legend" class="map-legend theme-legend" aria-label="마커 테마 범례"></div>
+
+                <aside id="detail-panel" class="detail-panel" aria-labelledby="detail-title" hidden>
+                    <button id="detail-close" class="detail-close" type="button" aria-label="상세정보 닫기">×</button>
+                    <div id="detail-media" class="detail-media" aria-hidden="true"></div>
+                    <div class="detail-copy">
+                        <span id="detail-category" class="detail-category"></span>
+                        <h3 id="detail-title">여행지 상세정보</h3>
+                        <p id="detail-address" class="detail-address"></p>
+                        <p id="detail-tel" class="detail-tel" hidden></p>
+                        <p id="detail-overview" class="detail-overview" aria-live="polite"></p>
+                        <div class="detail-actions">
+                            <button id="place-description-open" class="detail-description-button" type="button">설명 보기</button>
+                            <a id="hotplace-add-from-detail" class="detail-hotplace-button" href="#" hidden>📸 핫플레이스로 등록</a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- 여행지 상세 설명 모달: 상세 패널의 "설명 보기"로 연다. -->
+        <dialog id="place-description-dialog" class="member-dialog place-description-dialog" aria-labelledby="place-description-title">
+            <div class="member-modal">
+                <header class="member-modal-header">
+                    <div>
+                        <p class="eyebrow">PLACE STORY</p>
+                        <h2 id="place-description-title">여행지 설명</h2>
+                    </div>
+                    <button id="place-description-close" class="member-close" type="button" aria-label="여행지 설명 닫기">×</button>
+                </header>
+                <div id="place-description-image" class="place-description-image" aria-hidden="true"></div>
+                <span id="place-description-category" class="detail-category"></span>
+                <p id="place-description-address" class="place-description-address"></p>
+                <p id="place-description-tel" class="place-description-address" hidden></p>
+                <p id="place-description-overview" class="place-description-overview"></p>
+                <div class="member-actions">
+                    <button id="place-description-confirm" class="member-primary" type="button">확인</button>
+                </div>
+            </div>
+        </dialog>
+    </main>
+    <div id="site-footer"></div>
+</body>
+</html>
