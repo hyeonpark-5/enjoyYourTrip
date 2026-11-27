@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>핫플레이스 등록 | EnjoyTrip</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app.css">
+<script src="js/common/theme-init.js"></script>
+<script src="js/config.js"></script>
+<script type="module" src="js/pages/hotplace-form.js"></script>
+</head>
+<body data-page="hotplace">
+    <div id="site-header"></div>
+    <main id="main">
+        <section class="auth-card wide member-modal">
+            <header class="member-modal-header">
+                <div>
+                    <p id="form-eyebrow" class="eyebrow">NEW HOT PLACE</p>
+                    <h2 id="form-title">핫플레이스 등록</h2>
+                </div>
+            </header>
+
+            <form id="hotplace-form" class="member-form" hidden>
+                <!-- 관광지 정보는 서버가 조회한 값이며 수정할 수 없다. -->
+                <div class="hotplace-place-summary">
+                    <strong id="place-name"></strong>
+                    <span id="place-address"></span>
+                </div>
+
+                <div class="hotplace-photo-field">
+                    <div id="hotplace-photo-preview" class="hotplace-photo-preview" aria-label="사진 미리보기">
+                        <span aria-hidden="true">📷</span>
+                        <small>여행 사진을 선택해 주세요.</small>
+                    </div>
+                    <div class="member-field hotplace-photo-control">
+                        <label for="hotplace-photo">여행 사진</label>
+                        <div class="hotplace-file-picker">
+                            <label class="hotplace-file-button" for="hotplace-photo">사진 파일 선택</label>
+                            <span id="hotplace-photo-name">선택된 파일 없음</span>
+                        </div>
+                        <input id="hotplace-photo" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp" />
+                        <small id="photo-help">선택하지 않으면 관광지 기본 사진을 사용합니다. JPG, PNG, WebP · 최대 8MB</small>
+                        <label id="remove-photo-label" class="remove-photo" hidden><input type="checkbox" id="remove-photo" />
+                            올린 사진 삭제 (관광지 기본 사진 사용)</label>
+                    </div>
+                </div>
+
+                <div class="hotplace-field-row">
+                    <div class="member-field">
+                        <label for="hotplace-visited-date">다녀온 날짜</label>
+                        <input id="hotplace-visited-date" type="date" required />
+                    </div>
+                    <div class="member-field">
+                        <label for="hotplace-type">장소 유형</label>
+                        <select id="hotplace-type" required></select>
+                    </div>
+                </div>
+
+                <div class="member-field">
+                    <label for="hotplace-description">상세 설명</label>
+                    <textarea id="hotplace-description" rows="6" maxlength="500" required
+                        placeholder="이 장소에서의 기억과 추천 포인트를 적어주세요."></textarea>
+                    <small><span id="hotplace-description-count">0</span>/500자</small>
+                </div>
+
+                <p id="hotplace-form-message" class="member-form-message" role="alert"></p>
+
+                <div class="member-actions">
+                    <a id="cancel" class="btn-link member-secondary" href="tour.html">취소</a>
+                    <button id="hotplace-save" type="submit" class="member-primary">핫플레이스 저장</button>
+                </div>
+            </form>
+            <p id="load-error" class="alert-msg" role="alert"></p>
+        </section>
+    </main>
+    <div id="site-footer"></div>
+</body>
+</html>

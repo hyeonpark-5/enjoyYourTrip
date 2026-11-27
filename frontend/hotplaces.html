@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나만의 핫플레이스 | EnjoyTrip</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app.css">
+<script src="js/common/theme-init.js"></script>
+<script src="js/config.js"></script>
+<script type="module" src="js/pages/hotplaces.js"></script>
+</head>
+<body data-page="hotplace">
+    <div id="site-header"></div>
+    <main id="main">
+        <div class="page-head">
+            <p class="eyebrow">MY HOT PLACES</p>
+            <h1>나만의 핫플레이스</h1>
+            <p>다녀온 여행지의 사진과 추억을 기록하고 지도에서 다시 확인해 보세요. 관광지 찾기에서 관광지를 고른 뒤 "핫플레이스로 등록"을 눌러 기록을 남길 수 있어요.</p>
+        </div>
+
+        <div id="map-wrap" class="hotplace-map-wrap" hidden>
+            <div id="map" aria-label="내 핫플레이스 위치 지도"></div>
+        </div>
+
+        <section id="hotplace" class="hotplace-section" aria-labelledby="hotplace-title">
+            <header class="hotplace-heading">
+                <div>
+                    <p class="eyebrow">MY HOT PLACES</p>
+                    <h2 id="hotplace-title">내가 남긴 기록</h2>
+                </div>
+                <div class="hotplace-heading-actions">
+                    <span><strong id="hotplace-count">0</strong>개의 기록</span>
+                    <a class="hotplace-add-button" href="tour.html">+ 관광지에서 등록하기</a>
+                </div>
+            </header>
+
+            <div id="carousel" class="hotplace-carousel" hidden>
+                <button id="hotplace-prev" class="hotplace-scroll-button hotplace-scroll-prev" type="button" aria-label="이전 핫플레이스 보기" hidden></button>
+                <div id="hotplace-list" class="hotplace-list"></div>
+                <button id="hotplace-next" class="hotplace-scroll-button hotplace-scroll-next" type="button" aria-label="다음 핫플레이스 보기" hidden></button>
+            </div>
+
+            <div id="hotplace-empty" class="hotplace-empty" hidden>
+                <span aria-hidden="true">📷</span>
+                <strong>아직 등록한 핫플레이스가 없어요.</strong>
+                <p>관광지를 선택하고 사진과 여행 기록을 남겨보세요.</p>
+                <a class="btn-link member-primary" href="tour.html">관광지 찾으러 가기</a>
+            </div>
+        </section>
+    </main>
+    <div id="site-footer"></div>
+</body>
+</html>
