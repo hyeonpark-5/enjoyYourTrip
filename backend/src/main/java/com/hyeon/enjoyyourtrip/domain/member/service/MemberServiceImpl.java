@@ -5,11 +5,9 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hyeon.enjoyyourtrip.domain.auth.repository.RefreshTokenRepository;
 import com.hyeon.enjoyyourtrip.domain.member.dto.Request.MemberSearchRequest;
 import com.hyeon.enjoyyourtrip.domain.member.dto.Request.MemberUpdateRequest;
 import com.hyeon.enjoyyourtrip.domain.member.dto.Response.MemberResponse;
@@ -24,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * 회원 조회·수정·탈퇴. 접근 권한(본인 또는 관리자)은 컨트롤러의 @PreAuthorize에서 검사한다.
+ * 역할 변경·탈퇴는 Keycloak에도 반영하며, Keycloak 호출이 실패하면 우리 DB 변경도 롤백된다.
  */
 @Service
 @RequiredArgsConstructor
@@ -32,8 +31,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
-    private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final IdentityProviderClient identityProviderClient;
     private final Clock clock;
 
     @Override
@@ -59,9 +57,6 @@ public class MemberServiceImpl implements MemberService {
     public MemberResponse update(Long id, MemberUpdateRequest request) {
         Member member = findActive(id);
         member.changeName(request.name().trim());
-        if (request.password() != null) {
-            member.changePassword(passwordEncoder.encode(request.password()));
-        }
         return memberMapper.toResponse(member);
     }
 
@@ -70,16 +65,20 @@ public class MemberServiceImpl implements MemberService {
     public MemberResponse changeRole(Long id, Role role) {
         Member member = findActive(id);
         member.changeRole(role);
+        if (member.getKeycloakId() != null) {
+            identityProviderClient.setAdmin(member.getKeycloakId(), role == Role.ADMIN);
+        }
         return memberMapper.toResponse(member);
     }
 
-    /** 소프트 삭제 후 모든 기기의 Refresh Token을 폐기한다. */
     @Transactional
     @Override
     public void withdraw(Long id) {
         Member member = findActive(id);
         member.withdraw(LocalDateTime.now(clock));
-        refreshTokenRepository.deleteAllByMemberId(id);
+        if (member.getKeycloakId() != null) {
+            identityProviderClient.disableUser(member.getKeycloakId());
+        }
     }
 
     private Member findActive(Long id) {

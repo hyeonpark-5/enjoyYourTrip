@@ -18,11 +18,12 @@ public interface MemberService {
     /** 탈퇴하지 않은 회원을 이름 또는 이메일로 검색한다. */
     PageResponse<MemberResponse> search(MemberSearchRequest condition, Pageable pageable);
 
-    /** 이름을 바꾸고, 비밀번호가 주어지면 함께 바꾼다. */
+    /** 화면에 보이는 이름을 바꾼다. */
     MemberResponse update(Long id, MemberUpdateRequest request);
 
+    /** 우리 DB와 Keycloak realm 역할을 함께 바꾼다. 대상 회원의 토큰에는 다음 갱신부터 반영된다. */
     MemberResponse changeRole(Long id, Role role);
 
-    /** 소프트 삭제 후 모든 기기의 Refresh Token을 폐기한다. */
+    /** 소프트 삭제하고 Keycloak 계정을 비활성화(모든 세션 종료)한다. */
     void withdraw(Long id);
 }

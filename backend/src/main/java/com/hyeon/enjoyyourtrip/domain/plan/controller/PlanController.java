@@ -3,8 +3,6 @@ package com.hyeon.enjoyyourtrip.domain.plan.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +18,7 @@ import com.hyeon.enjoyyourtrip.domain.plan.dto.Request.PlanUpdateRequest;
 import com.hyeon.enjoyyourtrip.domain.plan.dto.Response.PlanDetailResponse;
 import com.hyeon.enjoyyourtrip.domain.plan.dto.Response.PlanSummaryResponse;
 import com.hyeon.enjoyyourtrip.domain.plan.service.PlanService;
+import com.hyeon.enjoyyourtrip.global.security.CurrentMemberId;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,38 +35,34 @@ public class PlanController {
 
     @Operation(summary = "내 여행 계획 목록", description = "최신 작성순. 동선 요약과 총 직선거리 포함")
     @GetMapping
-    public List<PlanSummaryResponse> findMine(@AuthenticationPrincipal Jwt jwt) {
-        return planService.findMine(memberId(jwt));
+    public List<PlanSummaryResponse> findMine(@CurrentMemberId Long memberId) {
+        return planService.findMine(memberId);
     }
 
     @Operation(summary = "여행 계획 상세")
     @GetMapping("/{id}")
-    public PlanDetailResponse get(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
-        return planService.getMine(id, memberId(jwt));
+    public PlanDetailResponse get(@PathVariable Long id, @CurrentMemberId Long memberId) {
+        return planService.getMine(id, memberId);
     }
 
     @Operation(summary = "여행 계획 만들기", description = "stops는 방문 순서대로 관광지 검색 결과의 id·name·address·lat·lng·contentTypeId")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PlanDetailResponse create(@Valid @RequestBody PlanCreateRequest request, @AuthenticationPrincipal Jwt jwt) {
-        return planService.create(request, memberId(jwt));
+    public PlanDetailResponse create(@Valid @RequestBody PlanCreateRequest request, @CurrentMemberId Long memberId) {
+        return planService.create(request, memberId);
     }
 
     @Operation(summary = "여행 계획 수정 (전체 교체)")
     @PutMapping("/{id}")
     public PlanDetailResponse update(
-            @PathVariable Long id, @Valid @RequestBody PlanUpdateRequest request, @AuthenticationPrincipal Jwt jwt) {
-        return planService.update(id, request, memberId(jwt));
+            @PathVariable Long id, @Valid @RequestBody PlanUpdateRequest request, @CurrentMemberId Long memberId) {
+        return planService.update(id, request, memberId);
     }
 
     @Operation(summary = "여행 계획 삭제")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
-        planService.delete(id, memberId(jwt));
-    }
-
-    private static Long memberId(Jwt jwt) {
-        return Long.valueOf(jwt.getSubject());
+    public void delete(@PathVariable Long id, @CurrentMemberId Long memberId) {
+        planService.delete(id, memberId);
     }
 }

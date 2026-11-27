@@ -4,8 +4,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -24,6 +22,7 @@ import com.hyeon.enjoyyourtrip.domain.post.dto.Response.PostDetailResponse;
 import com.hyeon.enjoyyourtrip.domain.post.dto.Response.PostSummaryResponse;
 import com.hyeon.enjoyyourtrip.domain.post.service.PostService;
 import com.hyeon.enjoyyourtrip.global.common.PageResponse;
+import com.hyeon.enjoyyourtrip.global.security.CurrentMemberId;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -55,25 +54,21 @@ public class PostController {
     @Operation(summary = "게시글 작성", description = "공지사항(NOTICE)은 관리자만 작성할 수 있다.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PostDetailResponse write(@Valid @RequestBody PostCreateRequest request, @AuthenticationPrincipal Jwt jwt) {
-        return postService.write(request, memberId(jwt));
+    public PostDetailResponse write(@Valid @RequestBody PostCreateRequest request, @CurrentMemberId Long memberId) {
+        return postService.write(request, memberId);
     }
 
     @Operation(summary = "게시글 수정 (작성자 또는 관리자)")
     @PatchMapping("/{id}")
     public PostDetailResponse edit(
-            @PathVariable Long id, @Valid @RequestBody PostUpdateRequest request, @AuthenticationPrincipal Jwt jwt) {
-        return postService.edit(id, request, memberId(jwt));
+            @PathVariable Long id, @Valid @RequestBody PostUpdateRequest request, @CurrentMemberId Long memberId) {
+        return postService.edit(id, request, memberId);
     }
 
     @Operation(summary = "게시글 삭제 (작성자 또는 관리자)")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
-        postService.delete(id, memberId(jwt));
-    }
-
-    private static Long memberId(Jwt jwt) {
-        return Long.valueOf(jwt.getSubject());
+    public void delete(@PathVariable Long id, @CurrentMemberId Long memberId) {
+        postService.delete(id, memberId);
     }
 }

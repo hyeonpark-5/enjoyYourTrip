@@ -9,8 +9,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -20,8 +18,8 @@ import com.hyeon.enjoyyourtrip.global.security.ProblemDetailAuthenticationEntryP
 import lombok.RequiredArgsConstructor;
 
 /**
- * 세션 없는(STATELESS) REST API 보안 설정. Authorization: Bearer {JWT} 헤더로 인증한다.
- * JWT 검증기(JwtDecoder)는 JwtConfig에 있으며, Keycloak 도입 시에도 이 구성은 그대로 둔다.
+ * 세션 없는(STATELESS) REST API 보안 설정. Keycloak이 발급한 Access Token을 Authorization: Bearer 헤더로 받는다.
+ * 로그인·회원가입·비밀번호는 Keycloak 화면이 맡으므로 이 서버에는 인증 API가 없다.
  */
 @Configuration
 @EnableWebSecurity
@@ -38,17 +36,8 @@ public class SecurityConfig {
             "/swagger-ui.html"
     };
 
-    /** 로그인 없이 호출하는 인증 API (로그아웃은 Access Token 필요) */
-    private static final String[] PUBLIC_AUTH_POST_PATHS = {
-            "/api/v1/auth/signup",
-            "/api/v1/auth/login",
-            "/api/v1/auth/reissue",
-            "/api/v1/auth/password-reset"
-    };
-
     /** 로그인 없이 조회(GET)할 수 있는 API */
     private static final String[] PUBLIC_GET_PATHS = {
-            "/api/v1/auth/email-check",
             "/api/v1/posts",
             "/api/v1/posts/*",
             "/api/v1/tours/**"
@@ -69,7 +58,6 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_PATHS).permitAll()
-                        .requestMatchers(HttpMethod.POST, PUBLIC_AUTH_POST_PATHS).permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET_PATHS).permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(resourceServer -> resourceServer
@@ -80,10 +68,5 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler));
         return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }

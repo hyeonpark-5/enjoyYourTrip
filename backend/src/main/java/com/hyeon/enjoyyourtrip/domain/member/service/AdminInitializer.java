@@ -2,47 +2,46 @@ package com.hyeon.enjoyyourtrip.domain.member.service;
 
 import java.util.Locale;
 
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.hyeon.enjoyyourtrip.domain.member.entity.Member;
-import com.hyeon.enjoyyourtrip.domain.member.entity.Role;
-import com.hyeon.enjoyyourtrip.domain.member.repository.MemberRepository;
 import com.hyeon.enjoyyourtrip.global.config.AdminProperties;
+import com.hyeon.enjoyyourtrip.global.exception.BusinessException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 서버 시작 시 .env의 ADMIN_EMAIL/ADMIN_PASSWORD로 관리자 계정을 만든다(이미 있으면 건너뜀).
- * 비밀번호가 SQL 파일(깃)에 남지 않도록 마이그레이션 대신 이 방식을 쓴다.
+ * 서버가 뜬 뒤 .env의 ADMIN_EMAIL/ADMIN_PASSWORD로 Keycloak에 관리자 계정을 만들고 ADMIN 역할을 준다(이미 있으면 역할만 확인).
+ * 우리 DB의 회원 정보는 그 계정으로 처음 로그인할 때 만들어진다.
+ * Keycloak이 아직 안 떠 있으면 경고만 남기고 넘어간다(서버 재시작 시 다시 시도).
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 @EnableConfigurationProperties(AdminProperties.class)
-public class AdminInitializer implements ApplicationRunner {
+public class AdminInitializer {
 
     private final AdminProperties properties;
-    private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final IdentityProviderClient identityProviderClient;
 
-    @Override
-    @Transactional
-    public void run(ApplicationArguments args) {
+    @EventListener(ApplicationReadyEvent.class)
+    public void createAdmin() {
         if (!properties.isConfigured()) {
             return;
         }
         String email = properties.email().trim().toLowerCase(Locale.ROOT);
-        if (memberRepository.existsByEmail(email)) {
-            return;
+        try {
+            String keycloakId = identityProviderClient.findUserIdByEmail(email)
+                    .orElseGet(() -> {
+                        log.info("Keycloak에 관리자 계정을 만듭니다: {}", email);
+                        return identityProviderClient.createUser(email, properties.password(), properties.name());
+                    });
+            identityProviderClient.setAdmin(keycloakId, true);
+        } catch (BusinessException e) {
+            log.warn("관리자 계정을 준비하지 못했습니다. Keycloak 실행과 KEYCLOAK_* 설정을 확인하세요. ({})", e.getMessage());
         }
-        memberRepository.save(Member.create(
-                email, passwordEncoder.encode(properties.password()), properties.name(), Role.ADMIN));
-        log.info("관리자 계정을 생성했습니다: {}", email);
     }
 }

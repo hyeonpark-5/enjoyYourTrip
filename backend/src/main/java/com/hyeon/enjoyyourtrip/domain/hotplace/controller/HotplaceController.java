@@ -10,8 +10,6 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,6 +27,7 @@ import com.hyeon.enjoyyourtrip.domain.hotplace.dto.Request.HotplaceUpdateRequest
 import com.hyeon.enjoyyourtrip.domain.hotplace.dto.Response.HotplaceResponse;
 import com.hyeon.enjoyyourtrip.domain.hotplace.dto.Response.PlaceTypeResponse;
 import com.hyeon.enjoyyourtrip.domain.hotplace.service.HotplaceService;
+import com.hyeon.enjoyyourtrip.global.security.CurrentMemberId;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,14 +50,14 @@ public class HotplaceController {
 
     @Operation(summary = "내 핫플레이스 목록", description = "최신 등록순")
     @GetMapping
-    public List<HotplaceResponse> findMine(@AuthenticationPrincipal Jwt jwt) {
-        return hotplaceService.findMine(memberId(jwt));
+    public List<HotplaceResponse> findMine(@CurrentMemberId Long memberId) {
+        return hotplaceService.findMine(memberId);
     }
 
     @Operation(summary = "핫플레이스 상세")
     @GetMapping("/{id}")
-    public HotplaceResponse get(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
-        return hotplaceService.getMine(id, memberId(jwt));
+    public HotplaceResponse get(@PathVariable Long id, @CurrentMemberId Long memberId) {
+        return hotplaceService.getMine(id, memberId);
     }
 
     @Operation(summary = "핫플레이스 등록", description = "multipart/form-data: placeId, placeType(선택), visitedDate, description, photo(선택, 8MB 이하)")
@@ -67,8 +66,8 @@ public class HotplaceController {
     public HotplaceResponse create(
             @Valid @ModelAttribute HotplaceCreateRequest request,
             @RequestPart(name = "photo", required = false) MultipartFile photo,
-            @AuthenticationPrincipal Jwt jwt) {
-        return hotplaceService.create(request, bytes(photo), memberId(jwt));
+            @CurrentMemberId Long memberId) {
+        return hotplaceService.create(request, bytes(photo), memberId);
     }
 
     @Operation(summary = "핫플레이스 수정", description = "multipart/form-data: placeType, visitedDate, description, removePhoto, photo(선택)")
@@ -77,24 +76,24 @@ public class HotplaceController {
             @PathVariable Long id,
             @Valid @ModelAttribute HotplaceUpdateRequest request,
             @RequestPart(name = "photo", required = false) MultipartFile photo,
-            @AuthenticationPrincipal Jwt jwt) {
-        return hotplaceService.update(id, request, bytes(photo), memberId(jwt));
+            @CurrentMemberId Long memberId) {
+        return hotplaceService.update(id, request, bytes(photo), memberId);
     }
 
     @Operation(summary = "핫플레이스 삭제")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
-        hotplaceService.delete(id, memberId(jwt));
+    public void delete(@PathVariable Long id, @CurrentMemberId Long memberId) {
+        hotplaceService.delete(id, memberId);
     }
 
     @Operation(summary = "핫플레이스 사진", description = "image/jpeg. 본인만 볼 수 있다.")
     @GetMapping("/{id}/photo")
-    public ResponseEntity<Resource> photo(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<Resource> photo(@PathVariable Long id, @CurrentMemberId Long memberId) {
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .cacheControl(CacheControl.maxAge(Duration.ofHours(1)).cachePrivate())
-                .body(hotplaceService.getPhoto(id, memberId(jwt)));
+                .body(hotplaceService.getPhoto(id, memberId));
     }
 
     private static byte[] bytes(MultipartFile photo) {
@@ -106,9 +105,5 @@ public class HotplaceController {
         } catch (IOException e) {
             throw new UncheckedIOException("업로드한 사진을 읽지 못했습니다.", e);
         }
-    }
-
-    private static Long memberId(Jwt jwt) {
-        return Long.valueOf(jwt.getSubject());
     }
 }

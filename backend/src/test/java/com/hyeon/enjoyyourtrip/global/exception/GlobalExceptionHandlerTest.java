@@ -1,5 +1,7 @@
 package com.hyeon.enjoyyourtrip.global.exception;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -9,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.Clock;
 import java.time.Instant;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.jwt.BadJwtException;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -31,7 +36,7 @@ import com.hyeon.enjoyyourtrip.global.config.CorsConfig;
 import com.hyeon.enjoyyourtrip.global.config.JwtConfig;
 import com.hyeon.enjoyyourtrip.global.config.SecurityConfig;
 import com.hyeon.enjoyyourtrip.global.config.TimeConfig;
-import com.hyeon.enjoyyourtrip.global.security.AccessTokenBlacklist;
+import com.hyeon.enjoyyourtrip.global.security.CurrentMember;
 import com.hyeon.enjoyyourtrip.global.security.ProblemDetailAccessDeniedHandler;
 import com.hyeon.enjoyyourtrip.global.security.ProblemDetailAuthenticationEntryPoint;
 
@@ -56,9 +61,18 @@ class GlobalExceptionHandlerTest {
     @Autowired
     MockMvc mockMvc;
 
-    /** 웹 슬라이스 테스트에는 Redis가 없으므로 블랙리스트는 가짜로 둔다. */
+    /** Keycloak 없이: 모든 토큰을 위조로 본다(로그인 사용자는 @WithMockUser로 만든다). */
     @MockitoBean
-    AccessTokenBlacklist accessTokenBlacklist;
+    JwtDecoder jwtDecoder;
+
+    /** @CurrentMemberId 리졸버가 웹 슬라이스에 함께 올라오므로 회원 조회는 가짜로 둔다. */
+    @MockitoBean
+    CurrentMember currentMember;
+
+    @BeforeEach
+    void rejectAllTokens() {
+        given(jwtDecoder.decode(anyString())).willThrow(new BadJwtException("위조된 토큰"));
+    }
 
     @Test
     @DisplayName("위조된 토큰은 401 INVALID_TOKEN으로 응답한다")

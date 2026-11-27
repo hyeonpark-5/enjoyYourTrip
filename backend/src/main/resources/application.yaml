@@ -3,7 +3,7 @@ spring:
   application:
     name: enjoyyourtrip
   profiles:
-    # 실행 시 프로필을 지정하지 않으면 local로 동작한다. (배포 시 SPRING_PROFILES_ACTIVE로 덮어씀)
+    # 실행 시 프로필을 지정하지 않으면 local로 동작한다.
     default: local
   jpa:
     open-in-view: false
@@ -22,33 +22,45 @@ spring:
     redis:
       time-to-live: 1h
       key-prefix: "cache:"
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Keycloak realm이 발급한 Access Token만 받는다. 서명 키는 첫 요청 때 jwk-set-uri에서 받아온다.
+          issuer-uri: ${KEYCLOAK_URL}/realms/enjoyyourtrip
+          jwk-set-uri: ${KEYCLOAK_URL}/realms/enjoyyourtrip/protocol/openid-connect/certs
+          audiences:
+            - enjoyyourtrip-api
   http:
     serviceclient:
       tour:
         base-url: ${TOUR_API_BASE_URL}   # .env에 설정
         connect-timeout: 5s
         read-timeout: 10s
+      keycloak-token:
+        base-url: ${KEYCLOAK_URL}
+        connect-timeout: 3s
+        read-timeout: 5s
+      keycloak-admin:
+        base-url: ${KEYCLOAK_URL}
+        connect-timeout: 3s
+        read-timeout: 5s
 
 server:
   port: 8080
 
 app:
-  jwt:
-    issuer: enjoyyourtrip
-    secret: ${JWT_SECRET:}          # .env에 32바이트 이상으로 설정
-    access-token-ttl: 30m
-    refresh-token-ttl: 14d
-    refresh-cookie:
-      path: /api/v1/auth
-      same-site: Lax
-      secure: false                 # HTTPS 배포 환경에서는 true
+  keycloak:
+    realm: enjoyyourtrip
+    client-id: enjoyyourtrip-backend
+    client-secret: ${KEYCLOAK_BACKEND_CLIENT_SECRET}
   storage:
     hotplace-image-dir: ${user.home}/enjoyyourtrip-data/hotplace-images
   tour-api:
     service-key: ${TOUR_API_KEY:}   # 공공데이터포털 디코딩 키
     mobile-app: EnjoyYourTrip
   admin:
-    # 비어 있지 않으면 서버 시작 시 관리자 계정이 없을 때 하나 만든다.
+    # 비어 있지 않으면 서버가 뜬 뒤 Keycloak에 관리자 계정이 없을 때 하나 만든다.
     email: ${ADMIN_EMAIL:}
     password: ${ADMIN_PASSWORD:}
     name: 관리자

@@ -15,6 +15,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.util.LinkedMultiValueMap;
@@ -25,6 +26,7 @@ import com.hyeon.enjoyyourtrip.domain.hotplace.repository.HotplaceRepository;
 import com.hyeon.enjoyyourtrip.domain.member.repository.MemberRepository;
 import com.hyeon.enjoyyourtrip.domain.tour.service.TourPlaceClient;
 import com.hyeon.enjoyyourtrip.infrastructure.tour.dto.PlaceInfo;
+import com.hyeon.enjoyyourtrip.support.KeycloakTokens;
 
 /**
  * 실제 내장 Tomcat으로 multipart 등록(POST)·수정(PATCH)이 해석되는지 확인한다.
@@ -40,6 +42,11 @@ class HotplaceMultipartServerTest {
     @MockitoBean
     TourPlaceClient tourPlaceClient;
 
+    @MockitoBean
+    JwtDecoder jwtDecoder;
+
+    final KeycloakTokens keycloak = new KeycloakTokens();
+
     @Autowired
     MemberRepository memberRepository;
 
@@ -49,19 +56,20 @@ class HotplaceMultipartServerTest {
     @Test
     @DisplayName("실제 서버에서 multipart POST로 등록하고 PATCH로 사진을 바꾼다")
     void multipartOverRealServer() throws Exception {
+        keycloak.install(jwtDecoder);
         given(tourPlaceClient.findDetail("126508")).willReturn(Optional.of(new PlaceInfo(
                 "126508", "경복궁", "1", "12", "서울", "", "", "", 37.579, 126.977)));
         RestClient client = RestClient.create("http://localhost:" + port);
         String email = "server-" + UUID.randomUUID() + "@example.com";
         Long memberId = null;
         try {
-            Map<?, ?> member = client.post().uri("/api/v1/auth/signup").contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("name", "서버", "email", email, "password", "password1234"))
+            // Keycloak에서 가입·로그인한 것과 같은 토큰을 가짜 JwtDecoder가 해석한다.
+            keycloak.register(email, "서버", "USER");
+            String token = keycloak.issue(email);
+            Map<?, ?> member = client.get().uri("/api/v1/members/me")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                     .retrieve().body(Map.class);
             memberId = ((Number) member.get("id")).longValue();
-            String token = (String) client.post().uri("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("email", email, "password", "password1234"))
-                    .retrieve().body(Map.class).get("accessToken");
 
             MultiValueMap<String, Object> create = form("placeId", "126508", "visitedDate", "2026-11-01",
                     "description", "실제 서버 등록");
