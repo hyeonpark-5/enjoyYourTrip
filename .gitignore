@@ -3,6 +3,7 @@
 .env.*
 !.env.example
 backend/src/main/resources/application-local.yaml
+backend/src/test/resources/application-test.yaml
 
 # IDE
 .idea/
