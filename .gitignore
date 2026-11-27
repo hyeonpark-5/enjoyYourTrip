@@ -1,0 +1,18 @@
+# 비밀값 (API 키, DB 비밀번호, JWT 시크릿)
+.env
+.env.*
+!.env.example
+backend/src/main/resources/application-local.yaml
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 로그
+*.log

@@ -1,0 +1,18 @@
+# 모든 환경 공통 설정. 환경별 값(DB, Redis 접속 정보 등)은 application-{profile}.yaml에 둔다.
+spring:
+  application:
+    name: enjoyyourtrip
+  profiles:
+    # 실행 시 프로필을 지정하지 않으면 local로 동작한다. (배포 시 SPRING_PROFILES_ACTIVE로 덮어씀)
+    default: local
+  jpa:
+    open-in-view: false
+    hibernate:
+      # 스키마는 Flyway(db/migration)가 관리하고, JPA는 엔티티와 일치하는지 검증만 한다.
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 8080
