@@ -1,0 +1,17 @@
+# 로컬 개발용 Redis. backend 폴더에서 `docker compose up -d` 로 실행한다.
+# 포트 값은 같은 폴더의 .env(REDIS_PORT, REDIS_INSIGHT_PORT)를 자동으로 읽고, 없으면 기본값을 쓴다.
+name: enjoyyourtrip
+
+services:
+  redis-stack:
+    image: redis/redis-stack:latest
+    container_name: redis-vectorstore
+    ports:
+      - "${REDIS_PORT:-6379}:6379"          # Redis 기본 포트
+      - "${REDIS_INSIGHT_PORT:-8001}:8001"  # Redis Insight (GUI 접속용 포트)
+    volumes:
+      - redis_data:/data # 데이터를 로컬에 보관하여 컨테이너 재시작 후에도 유지
+    restart: always
+
+volumes:
+  redis_data:
