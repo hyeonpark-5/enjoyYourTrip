@@ -15,6 +15,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -65,6 +66,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     /** 보안 필터의 인증 실패(SecurityConfig의 EntryPoint가 이쪽으로 위임) */
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ProblemDetail> handleAuthentication(AuthenticationException e, HttpServletRequest request) {
+        if (e instanceof OAuth2AuthenticationException) {
+            // 토큰이 있지만 만료·위조·로그아웃됨 → 클라이언트는 재발급(/auth/reissue)을 시도한다.
+            return problem(HttpStatus.UNAUTHORIZED, "INVALID_TOKEN", "유효하지 않거나 만료된 토큰입니다.", request);
+        }
         return problem(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "인증이 필요합니다.", request);
     }
 

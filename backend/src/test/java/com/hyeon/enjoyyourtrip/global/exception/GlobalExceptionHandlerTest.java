@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,21 +28,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hyeon.enjoyyourtrip.global.config.CorsConfig;
+import com.hyeon.enjoyyourtrip.global.config.JwtConfig;
 import com.hyeon.enjoyyourtrip.global.config.SecurityConfig;
 import com.hyeon.enjoyyourtrip.global.config.TimeConfig;
+import com.hyeon.enjoyyourtrip.global.security.AccessTokenBlacklist;
 import com.hyeon.enjoyyourtrip.global.security.ProblemDetailAccessDeniedHandler;
 import com.hyeon.enjoyyourtrip.global.security.ProblemDetailAuthenticationEntryPoint;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
-@WebMvcTest
+@WebMvcTest(controllers = GlobalExceptionHandlerTest.TestController.class)
 @ActiveProfiles("test")
 @Import({
         GlobalExceptionHandlerTest.TestController.class,
         GlobalExceptionHandlerTest.FixedClockConfig.class,
         SecurityConfig.class,
         CorsConfig.class,
+        JwtConfig.class,
         ProblemDetailAuthenticationEntryPoint.class,
         ProblemDetailAccessDeniedHandler.class
 })
@@ -51,6 +55,18 @@ class GlobalExceptionHandlerTest {
 
     @Autowired
     MockMvc mockMvc;
+
+    /** 웹 슬라이스 테스트에는 Redis가 없으므로 블랙리스트는 가짜로 둔다. */
+    @MockitoBean
+    AccessTokenBlacklist accessTokenBlacklist;
+
+    @Test
+    @DisplayName("위조된 토큰은 401 INVALID_TOKEN으로 응답한다")
+    void invalidToken() throws Exception {
+        mockMvc.perform(get("/test/not-found").header("Authorization", "Bearer not-a-jwt"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("INVALID_TOKEN"));
+    }
 
     @Test
     @WithMockUser
