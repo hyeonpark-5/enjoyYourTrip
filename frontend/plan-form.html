@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>새 여행 계획 | EnjoyTrip</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app.css">
+<script src="js/common/theme-init.js"></script>
+<script src="js/config.js"></script>
+<script type="module" src="js/pages/plan-form.js"></script>
+</head>
+<body data-page="plan">
+    <div id="site-header"></div>
+    <main id="main">
+        <div class="page-head">
+            <p class="eyebrow">TRIP PLANNER</p>
+            <h1 id="page-title">나만의 여행 계획</h1>
+            <p>관광지를 찾아 경로에 담고, 일정과 예상 경비를 한 번에 정리해 보세요.</p>
+        </div>
+
+        <div class="plan-layout plan-edit">
+            <section class="feature-card plan-route-card" aria-labelledby="plan-route-title">
+                <div class="feature-card-heading">
+                    <div><span>STEP 1</span><h2 id="plan-route-title">여행 동선</h2></div>
+                    <span id="plan-route-count" class="filter-chip">0곳</span>
+                </div>
+                <div class="plan-search-row">
+                    <input id="plan-place-search" type="search" placeholder="관광지명 검색" autocomplete="off" maxlength="30" />
+                    <button id="plan-place-search-button" class="search-button" type="button">찾기</button>
+                </div>
+                <p id="plan-search-status" class="data-status" aria-live="polite">관광지를 검색해 일정에 추가하세요.</p>
+                <div id="plan-search-results" class="plan-search-results"></div>
+                <p class="drag-help">아래 장소를 드래그하거나 ↑↓ 버튼으로 방문 순서를 바꿀 수 있어요.</p>
+                <ol id="plan-route-list" class="plan-route-list"></ol>
+            </section>
+
+            <section class="feature-card plan-map-card" aria-labelledby="plan-map-title">
+                <div class="feature-card-heading">
+                    <div><span>ROUTE MAP</span><h2 id="plan-map-title">경로 미리보기</h2></div>
+                    <span id="plan-route-distance" class="filter-chip">총 직선거리 0 km</span>
+                </div>
+                <div id="plan-map" class="plan-map" aria-label="여행 계획 경로 지도">
+                    <div class="plan-map-placeholder"><p>여행지를 추가하면 지도에 경로가 표시됩니다.</p></div>
+                </div>
+            </section>
+
+            <section class="feature-card plan-editor" aria-labelledby="plan-editor-title">
+                <div class="feature-card-heading">
+                    <div><span>STEP 2</span><h2 id="plan-editor-title">계획 정보</h2></div>
+                </div>
+                <form id="plan-form" class="feature-form">
+                    <div class="plan-field-row">
+                        <label>계획 이름<input id="plan-name" maxlength="40" required placeholder="예: 가을 서울 1박 2일" /></label>
+                        <label>예상 경비<input id="plan-budget" type="number" min="0" max="10000000000" step="1000" placeholder="원 단위" /></label>
+                    </div>
+                    <div class="plan-field-row">
+                        <label>출발일<input id="plan-start-date" type="date" required /></label>
+                        <label>도착일<input id="plan-end-date" type="date" required /></label>
+                    </div>
+                    <label>상세 계획<textarea id="plan-notes" rows="4" maxlength="800"
+                        placeholder="준비물, 이동 방법, 예약 정보 등을 적어주세요."></textarea></label>
+
+                    <p id="plan-form-message" class="member-form-message" role="alert"></p>
+                    <div class="feature-actions">
+                        <a class="btn-link member-secondary" href="plans.html">취소</a>
+                        <button id="plan-save" class="member-primary" type="submit">계획 저장</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+    <div id="site-footer"></div>
+</body>
+</html>
