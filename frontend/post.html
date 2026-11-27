@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>게시글 | EnjoyTrip</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app.css">
+<script src="js/common/theme-init.js"></script>
+<script src="js/config.js"></script>
+<script type="module" src="js/pages/post.js"></script>
+</head>
+<body data-page="board">
+    <div id="site-header"></div>
+    <main id="main">
+        <article id="post-card" class="feature-card post-card" hidden>
+            <header class="post-header">
+                <span id="post-type" class="filter-chip"></span>
+                <h1 id="post-title"></h1>
+                <p class="post-meta">
+                    <span id="post-author"></span>
+                    <span id="post-created"></span>
+                    <span id="post-updated" hidden></span>
+                    <span id="post-views"></span>
+                </p>
+            </header>
+            <!-- 본문은 textContent로만 넣는다(사용자 입력이 HTML로 해석되지 않게). -->
+            <div id="post-content" class="post-content"></div>
+            <div class="member-actions post-actions">
+                <a id="post-list" class="btn-link member-secondary" href="board.html">목록</a>
+                <a id="post-modify" class="btn-link member-primary" href="#" hidden>수정</a>
+                <button id="post-delete" type="button" class="member-danger btn-link" hidden>삭제</button>
+            </div>
+        </article>
+        <p id="form-message" class="alert-msg" role="alert"></p>
+    </main>
+    <div id="site-footer"></div>
+</body>
+</html>
