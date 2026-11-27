@@ -1,0 +1,573 @@
+/* style.css(프론트엔드 디자인)에 없는 JSP 화면용 보조 스타일. 색상은 style.css의 변수를 사용해 다크 모드에서도 따라간다. */
+
+.account-button {
+  display: inline-block;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* 페이지 제목 */
+.page-head {
+  margin-bottom: 1.4rem;
+}
+
+.page-head h1 {
+  margin-bottom: 0.4rem;
+}
+
+.page-head p {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+/* 회원 폼/프로필 카드 (모달 스타일을 페이지 카드로 사용) */
+.auth-card {
+  width: min(520px, 100%);
+  margin: 1rem auto 2rem;
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.auth-card .member-modal-header h2 {
+  font-size: 1.5rem;
+}
+
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 1rem;
+  border-radius: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.member-actions .btn-link,
+.member-actions button {
+  font-size: 0.9rem;
+}
+
+.member-text-button {
+  display: inline-block;
+}
+
+/* 알림/오류 */
+.alert-msg {
+  padding: 0.8rem 1rem;
+  border: 1px solid #e7bdb4;
+  border-radius: 0.75rem;
+  color: #a33e2c;
+  background: #fff7f5;
+  font-size: 0.85rem;
+}
+
+.info-msg {
+  padding: 0.8rem 1rem;
+  border: 1px solid rgba(16, 67, 103, 0.18);
+  border-radius: 0.75rem;
+  color: var(--primary-dark);
+  background: var(--primary-soft);
+  font-size: 0.85rem;
+}
+
+/* 이메일 중복 확인 피드백 */
+.member-field input.is-valid {
+  border-color: var(--primary);
+}
+
+.member-field input.is-invalid {
+  border-color: #b34732;
+}
+
+.field-feedback {
+  display: none;
+  margin-top: 0.32rem;
+  font-size: 0.72rem;
+}
+
+.field-feedback.valid {
+  color: var(--primary);
+}
+
+.field-feedback.invalid {
+  color: #b34732;
+}
+
+.is-valid ~ .field-feedback.valid,
+.is-invalid ~ .field-feedback.invalid {
+  display: block;
+}
+
+/* 회원 목록 */
+.list-search {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.5fr) minmax(200px, 1.5fr) auto;
+  gap: 0.9rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 1.1rem;
+  background: var(--surface);
+  box-shadow: 0 14px 32px rgba(23, 40, 51, 0.07);
+}
+
+.list-search input[type="text"] {
+  width: 100%;
+  height: 48px;
+  padding: 0 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: 0.72rem;
+  color: var(--ink);
+  background: #fbfcfc;
+}
+
+.data-table-wrap {
+  margin-top: 1.2rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 1.1rem;
+  background: var(--surface);
+  box-shadow: 0 14px 32px rgba(23, 40, 51, 0.07);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  font-size: 0.88rem;
+}
+
+.data-table th {
+  color: var(--muted);
+  background: var(--primary-soft);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.data-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.data-table a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.data-table a:hover {
+  text-decoration: underline;
+}
+
+.pager {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin: 1.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pager a {
+  display: block;
+  min-width: 38px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  color: var(--ink);
+  background: var(--surface);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.pager a:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.pager .active a {
+  border-color: var(--primary);
+  color: #fff;
+  background: var(--primary);
+}
+
+/* 관광지 찾기 */
+.tour-search {
+  grid-template-columns: minmax(110px, 0.7fr) minmax(130px, 0.9fr) minmax(200px, 1.6fr) auto;
+}
+
+.tour-search .search-field input {
+  width: 100%;
+  height: 48px;
+  padding: 0 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: 0.72rem;
+  color: var(--ink);
+  background: #fbfcfc;
+}
+
+.place-card .place-thumb,
+.place-card .place-number {
+  flex-shrink: 0;
+}
+
+.detail-overview {
+  white-space: pre-line;
+}
+
+.map-setup .setup-card {
+  max-width: 380px;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .tour-search,
+  .list-search {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 게시판 */
+.community-tab {
+  display: block;
+  text-align: center;
+}
+
+.board-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.2rem;
+}
+
+.board-table .col-no,
+.board-table .col-views {
+  width: 72px;
+  text-align: center;
+}
+
+.board-table .col-author {
+  width: 140px;
+}
+
+.board-table .col-date {
+  width: 120px;
+}
+
+.board-empty {
+  padding: 2.5rem 1rem;
+  color: var(--muted);
+  text-align: center !important;
+}
+
+.auth-card.wide {
+  width: min(760px, 100%);
+}
+
+.auth-card textarea {
+  width: 100%;
+}
+
+.post-card {
+  max-width: 820px;
+  margin: 1rem auto 2rem;
+  padding: 1.75rem;
+}
+
+.post-header h1 {
+  margin: 0.8rem 0 0.6rem;
+  font-size: 1.7rem;
+  word-break: break-word;
+}
+
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin-bottom: 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.post-content {
+  min-height: 160px;
+  padding: 1.4rem 0;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.post-actions {
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.post-actions form {
+  display: inline;
+}
+
+.post-actions .btn-link {
+  min-height: 42px;
+}
+
+/* 지도 마커 테마 범례 */
+.map-legend.theme-legend {
+  top: 1rem;
+  right: 1rem;
+  bottom: auto;
+  max-width: min(330px, calc(100% - 2rem));
+  flex-wrap: wrap;
+  gap: 0.35rem 0.7rem;
+}
+
+.legend-pin {
+  width: 18px;
+  height: 18px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.theme-marker {
+  cursor: pointer;
+}
+
+/* 날씨 위젯: 관광지 찾기 화면에는 여행 계획 버튼이 없으므로 하단 여백을 줄인다. */
+.weather-toggle {
+  bottom: 1.5rem;
+}
+
+.weather-panel {
+  bottom: 5.4rem;
+  height: min(620px, calc(100vh - 7rem));
+}
+
+/* 핫플레이스 */
+a.detail-hotplace-button {
+  display: inline-block;
+}
+
+a.detail-hotplace-button[hidden] {
+  display: none;
+}
+
+.hotplace-map-wrap {
+  position: relative;
+  height: 420px;
+  margin-bottom: 1.4rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: #dce6e8;
+  box-shadow: var(--shadow);
+}
+
+a.hotplace-add-button {
+  display: inline-flex;
+  align-items: center;
+}
+
+.hotplace-card {
+  border-color: var(--line);
+}
+
+.hotplace-card.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(16, 67, 103, 0.18);
+}
+
+.hotplace-card-placeholder {
+  display: grid;
+  place-items: center;
+  font-size: 2.4rem;
+}
+
+.hotplace-card-actions form {
+  display: contents;
+  margin: 0;
+}
+
+a.hotplace-edit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  border-radius: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.hotplace-marker.selected {
+  box-shadow: 0 0 0 4px rgba(244, 201, 93, 0.9), 0 7px 18px rgba(103, 42, 39, 0.4);
+}
+
+.hotplace-empty .btn-link {
+  margin-top: 0.8rem;
+}
+
+.remove-photo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.remove-photo input {
+  width: auto;
+  height: auto;
+}
+
+.hotplace-photo-preview.has-image {
+  border-style: solid;
+}
+
+.hotplace-photo-preview [hidden] {
+  display: none;
+}
+
+/* 여행 계획 */
+.plan-layout.plan-edit {
+  grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.4fr);
+  grid-template-areas:
+    "route map"
+    "editor editor";
+}
+
+.plan-route-list {
+  max-height: 210px;
+}
+
+.route-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.route-move {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  color: var(--primary-dark);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.route-move:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.plan-route-item.dragging {
+  opacity: 0.5;
+}
+
+.plan-map-placeholder p {
+  max-width: 28rem;
+  padding: 0 1rem;
+}
+
+.saved-plan-list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.saved-plan-item {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: var(--surface);
+}
+
+.saved-plan-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.saved-plan-item p {
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  word-break: break-word;
+}
+
+.saved-plan-item .saved-plan-route {
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+a.text-action {
+  display: inline-block;
+}
+
+.saved-plan-actions form {
+  display: inline;
+  margin: 0;
+}
+
+.saved-plan-card .feature-card-heading .btn-link {
+  min-height: 38px;
+}
+
+/* 관광지 찾기: 지역을 고른 뒤 전국 지역 선택 화면으로 돌아가는 버튼 */
+a.region-overview-button {
+  display: block;
+}
+
+a.region-overview-button[hidden] {
+  display: none;
+}
+
+/* 다크 모드: 위에서 값으로 고정한 밝은 색을 어두운 색으로 바꾼다. */
+html[data-theme="dark"] :is(.list-search input[type="text"], .tour-search .search-field input) {
+  background: #0a1520;
+}
+
+html[data-theme="dark"] .alert-msg {
+  border-color: #6b3a35;
+  color: #ffb4a8;
+  background: #2a1513;
+}
+
+html[data-theme="dark"] .hotplace-map-wrap {
+  background: var(--primary-soft);
+}
+
+@media (max-width: 760px) {
+  .plan-layout.plan-edit {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "route"
+      "map"
+      "editor";
+  }
+}
+
+/* ---- REST 프론트엔드 전환 시 추가 ---- */
+/* 서버 오류가 없을 때는 빈 경고 상자를 숨긴다. */
+.alert-msg:empty {
+  display: none;
+}
+
+/* JS가 hidden 속성으로 숨긴 요소는 display를 지정한 클래스(.btn-link 등)가 있어도 숨긴다. */
+[hidden] {
+  display: none !important;
+}
