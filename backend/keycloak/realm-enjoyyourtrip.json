@@ -1,0 +1,81 @@
+{
+  "realm": "enjoyyourtrip",
+  "displayName": "EnjoyYourTrip",
+  "enabled": true,
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "verifyEmail": false,
+  "rememberMe": true,
+  "internationalizationEnabled": true,
+  "supportedLocales": ["ko", "en"],
+  "defaultLocale": "ko",
+  "accessTokenLifespan": 900,
+  "roles": {
+    "realm": [
+      { "name": "USER", "description": "일반 회원" },
+      { "name": "ADMIN", "description": "관리자 (공지 작성, 회원 관리)" }
+    ]
+  },
+  "defaultRole": {
+    "name": "default-roles-enjoyyourtrip",
+    "composite": true,
+    "composites": {
+      "realm": ["USER", "offline_access", "uma_authorization"]
+    }
+  },
+  "clients": [
+    {
+      "clientId": "enjoyyourtrip-frontend",
+      "name": "EnjoyYourTrip Web",
+      "description": "브라우저 프론트엔드 (Authorization Code + PKCE)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://localhost:5500/*"],
+      "webOrigins": ["http://localhost:5500"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5500/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "enjoyyourtrip-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "enjoyyourtrip-backend",
+      "name": "EnjoyYourTrip API",
+      "description": "백엔드가 Admin API(회원 비활성화, 권한 변경)를 호출할 때 쓰는 서비스 계정",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "${KEYCLOAK_BACKEND_CLIENT_SECRET}",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "defaultClientScopes": ["basic", "roles", "profile", "email", "web-origins", "acr", "kc-admin-api"]
+    }
+  ],
+  "users": [
+    {
+      "username": "service-account-enjoyyourtrip-backend",
+      "enabled": true,
+      "serviceAccountClientId": "enjoyyourtrip-backend",
+      "clientRoles": {
+        "realm-management": ["manage-users", "view-users", "view-realm"]
+      }
+    }
+  ]
+}

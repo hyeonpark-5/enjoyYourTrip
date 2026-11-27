@@ -1,5 +1,5 @@
-# 로컬 개발용 Redis. backend 폴더에서 `docker compose up -d` 로 실행한다.
-# 포트 값은 같은 폴더의 .env(REDIS_PORT, REDIS_INSIGHT_PORT)를 자동으로 읽고, 없으면 기본값을 쓴다.
+# 로컬 개발용 인프라(Redis, Keycloak). backend 폴더에서 `docker compose up -d` 로 실행한다.
+# 값은 같은 폴더의 .env를 자동으로 읽고, 포트는 없으면 기본값을 쓴다.
 name: enjoyyourtrip
 
 services:
@@ -13,5 +13,25 @@ services:
       - redis_data:/data # 데이터를 로컬에 보관하여 컨테이너 재시작 후에도 유지
     restart: always
 
+  # 인증 서버. 관리 콘솔: http://localhost:8180/admin (KEYCLOAK_ADMIN_USERNAME / KEYCLOAK_ADMIN_PASSWORD)
+  # 처음 뜰 때 keycloak/realm-enjoyyourtrip.json으로 realm·역할·클라이언트를 만든다. 이미 있으면 건너뛴다.
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.2
+    container_name: keycloak
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_PORT: 8080
+      # realm JSON의 ${KEYCLOAK_BACKEND_CLIENT_SECRET} 자리에 들어간다.
+      KEYCLOAK_BACKEND_CLIENT_SECRET: ${KEYCLOAK_BACKEND_CLIENT_SECRET}
+    ports:
+      - "${KEYCLOAK_PORT:-8180}:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data                     # 내장 DB(dev-file) 보관
+      - ./keycloak:/opt/keycloak/data/import:ro             # 처음 실행 시 가져올 realm 설정
+    restart: always
+
 volumes:
   redis_data:
+  keycloak_data:
