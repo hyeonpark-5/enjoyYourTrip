@@ -46,6 +46,13 @@ public class SecurityConfig {
             "/api/v1/auth/password-reset"
     };
 
+    /** 로그인 없이 조회(GET)할 수 있는 API */
+    private static final String[] PUBLIC_GET_PATHS = {
+            "/api/v1/auth/email-check",
+            "/api/v1/posts",
+            "/api/v1/posts/*"
+    };
+
     private final ProblemDetailAuthenticationEntryPoint authenticationEntryPoint;
     private final ProblemDetailAccessDeniedHandler accessDeniedHandler;
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
@@ -62,7 +69,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_PATHS).permitAll()
                         .requestMatchers(HttpMethod.POST, PUBLIC_AUTH_POST_PATHS).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/auth/email-check").permitAll()
+                        .requestMatchers(HttpMethod.GET, PUBLIC_GET_PATHS).permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(resourceServer -> resourceServer
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
