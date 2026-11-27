@@ -20,11 +20,7 @@ if (user) {
             event.preventDefault();
             $("submit").disabled = true;
             try {
-                const password = $("password").value;
-                await api("/api/v1/members/" + member.id, {
-                    method: "PATCH",
-                    json: { name: $("name").value.trim(), password: password || null }
-                });
+                await api("/api/v1/members/" + member.id, { method: "PATCH", json: { name: $("name").value.trim() } });
                 if (isAdmin() && $("role").value !== member.role) {
                     await api("/api/v1/members/" + member.id + "/role", { method: "PATCH", json: { role: $("role").value } });
                 }

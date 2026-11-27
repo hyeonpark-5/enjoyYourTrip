@@ -1,6 +1,6 @@
 // 회원 정보 (member.html = 내 정보, member.html?id=3 = 관리자가 보는 다른 회원)
 import { api } from "../common/api.js";
-import { clearSession, isAdmin } from "../common/auth.js";
+import { accountManagement, isAdmin, logout } from "../common/auth.js";
 import { initPage } from "../common/layout.js";
 import { $, formatDate, params, redirectWithNotice, showFormError } from "../common/ui.js";
 
@@ -18,6 +18,9 @@ if (user) {
         $("member-role").textContent = member.role;
         $("member-created").textContent = formatDate(member.createdAt);
         $("member-modify").href = "member-form.html?id=" + member.id;
+        // 비밀번호·이메일은 Keycloak 계정 관리 화면에서 바꾼다 (본인만).
+        $("member-account").hidden = !isSelf;
+        $("member-account").addEventListener("click", () => accountManagement());
         $("member-profile").hidden = false;
 
         $("member-delete").addEventListener("click", async () => {
@@ -26,8 +29,7 @@ if (user) {
             try {
                 await api("/api/v1/members/" + member.id, { method: "DELETE" });
                 if (isSelf) {
-                    clearSession();
-                    redirectWithNotice("index.html", "탈퇴했습니다. 이용해 주셔서 감사합니다.");
+                    await logout(); // Keycloak 로그아웃 후 메인으로 돌아간다.
                 } else {
                     redirectWithNotice(isAdmin() ? "members.html" : "index.html", member.name + " 회원을 탈퇴시켰습니다.");
                 }

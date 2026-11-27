@@ -2,7 +2,7 @@
 // 사용: <body data-page="tour"> + <div id="site-header"></div> ... <div id="site-footer"></div>
 //       const user = await initPage({ requireAuth: true });
 import { API_BASE_URL } from "./api.js";
-import { currentUser, isAdmin, logout, requireLogin, restoreSession } from "./auth.js";
+import { currentUser, isAdmin, isConfigured, login, logout, register, requireLogin, restoreSession } from "./auth.js";
 import { $, consumeFlash, h, showNotice } from "./ui.js";
 
 const NAV = [
@@ -45,17 +45,11 @@ function renderHeader() {
     const account = user
         ? [
             h("a", { class: "account-button", href: "member.html", text: "내 정보 · " + user.name }),
-            h("button", {
-                class: "account-button account-button-primary", type: "button", text: "로그아웃",
-                onclick: async () => {
-                    await logout();
-                    location.href = "index.html";
-                }
-            })
+            h("button", { class: "account-button account-button-primary", type: "button", text: "로그아웃", onclick: () => logout() })
         ]
         : [
-            h("a", { class: "account-button", href: "signup.html", text: "회원가입" }),
-            h("a", { class: "account-button account-button-primary", href: "login.html", text: "로그인" })
+            h("button", { class: "account-button", type: "button", text: "회원가입", onclick: () => register() }),
+            h("button", { class: "account-button account-button-primary", type: "button", text: "로그인", onclick: () => login() })
         ];
 
     const header = h("header", { class: "site-header" },
@@ -122,11 +116,11 @@ function setupTheme(toggle) {
  * @returns 로그인한 회원 또는 null (로그인이 필요한데 안 했으면 로그인 화면으로 이동하고 null)
  */
 export async function initPage({ requireAuth = false, requireAdmin = false } = {}) {
-    const user = API_BASE_URL ? await restoreSession() : null;
+    const user = API_BASE_URL && isConfigured() ? await restoreSession() : null;
     renderHeader();
     renderFooter();
-    if (!API_BASE_URL) {
-        showNotice("js/config.js가 없습니다. config.example.js를 복사해 API_BASE_URL을 설정하세요.", "error");
+    if (!API_BASE_URL || !isConfigured()) {
+        showNotice("js/config.js 설정이 비어 있습니다. config.example.js를 참고해 API_BASE_URL과 KEYCLOAK_* 값을 채우세요.", "error");
     }
     const flash = consumeFlash();
     if (flash) showNotice(flash);

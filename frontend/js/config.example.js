@@ -3,5 +3,9 @@ window.APP_CONFIG = {
     // 백엔드 주소
     API_BASE_URL: "",
     // Kakao Developers > 앱 > 플랫폼 키 > JavaScript 키 (Web 플랫폼에 이 프론트 주소를 등록해야 한다)
-    KAKAO_APP_KEY: ""
+    KAKAO_APP_KEY: "",
+    // Keycloak 주소, realm 이름, 프론트엔드용 public 클라이언트 id (backend/keycloak/realm-enjoyyourtrip.json 참고)
+    KEYCLOAK_URL: "",
+    KEYCLOAK_REALM: "",
+    KEYCLOAK_CLIENT_ID: ""
 };

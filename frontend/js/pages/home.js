@@ -1,4 +1,5 @@
 import { api } from "../common/api.js";
+import { register } from "../common/auth.js";
 import { initPage } from "../common/layout.js";
 import { placeTypeOf } from "../common/kakao.js";
 import { $, h } from "../common/ui.js";
@@ -68,4 +69,5 @@ async function loadFeatured() {
 renderTiles();
 const user = await initPage();
 $("home-signup").hidden = Boolean(user);
+$("home-signup").addEventListener("click", () => register());
 loadFeatured();

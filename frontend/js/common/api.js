@@ -1,10 +1,8 @@
-// 백엔드 REST API 호출. Access Token을 붙이고, 만료되면 Refresh Token(HttpOnly 쿠키)으로 한 번 재발급한 뒤 다시 시도한다.
+// 백엔드 REST API 호출. Keycloak Access Token을 붙이고, 401 INVALID_TOKEN이면 토큰을 강제로 갱신해 한 번 더 시도한다.
 // 오류 응답(ProblemDetail)은 ApiError로 던진다: { status, code, message, errors[{field, message}] }
 
 const config = window.APP_CONFIG || {};
 export const API_BASE_URL = (config.API_BASE_URL || "").replace(/\/$/, "");
-
-const TOKEN_KEY = "enjoyTrip.accessToken";
 
 export class ApiError extends Error {
     constructor(status, problem) {
@@ -20,39 +18,12 @@ export class ApiError extends Error {
     }
 }
 
-export const token = {
-    get: () => safe(() => sessionStorage.getItem(TOKEN_KEY)),
-    set: (value) => safe(() => sessionStorage.setItem(TOKEN_KEY, value)),
-    clear: () => safe(() => sessionStorage.removeItem(TOKEN_KEY))
-};
+// auth.js가 Keycloak 초기화 후 연결한다(순환 import 방지).
+let tokenSource = { get: async () => null, forceRefresh: async () => false };
 
-function safe(fn) {
-    try {
-        return fn();
-    } catch (e) {
-        return null;
-    }
-}
-
-let reissuing = null;
-
-/** Refresh Token 쿠키로 새 Access Token을 받는다. 동시에 여러 요청이 401을 받아도 재발급은 한 번만 한다. */
-export function reissue() {
-    if (!reissuing) {
-        reissuing = fetch(API_BASE_URL + "/api/v1/auth/reissue", { method: "POST", credentials: "include" })
-            .then(async (response) => {
-                if (!response.ok) {
-                    token.clear();
-                    return false;
-                }
-                const body = await response.json();
-                token.set(body.accessToken);
-                return true;
-            })
-            .catch(() => false)
-            .finally(() => { reissuing = null; });
-    }
-    return reissuing;
+/** @param {{get: () => Promise<string|null>, forceRefresh: () => Promise<boolean>}} source */
+export function setTokenSource(source) {
+    tokenSource = source;
 }
 
 /**
@@ -60,19 +31,19 @@ export function reissue() {
  * @param {object} options method, json(객체 → JSON 본문), form(FormData), query(객체 → 쿼리스트링), raw(true면 Response 반환)
  */
 export async function api(path, options = {}) {
-    const response = await send(path, options);
-    if (response.status === 401 && token.get() && !options.noRetry) {
+    const accessToken = await tokenSource.get();
+    const response = await send(path, options, accessToken);
+    if (response.status === 401 && accessToken) {
         const problem = await readProblem(response.clone());
-        if (problem && problem.code === "INVALID_TOKEN" && await reissue()) {
-            return handle(await send(path, options), options);
+        if (problem && problem.code === "INVALID_TOKEN" && await tokenSource.forceRefresh()) {
+            return handle(await send(path, options, await tokenSource.get()), options);
         }
     }
     return handle(response, options);
 }
 
-function send(path, { method = "GET", json, form, query } = {}) {
+function send(path, { method = "GET", json, form, query } = {}, accessToken) {
     const headers = {};
-    const accessToken = token.get();
     if (accessToken) headers.Authorization = "Bearer " + accessToken;
     let body;
     if (json !== undefined) {
@@ -81,7 +52,7 @@ function send(path, { method = "GET", json, form, query } = {}) {
     } else if (form) {
         body = form; // 브라우저가 multipart 경계(boundary)를 붙인다.
     }
-    return fetch(API_BASE_URL + path + toQuery(query), { method, headers, body, credentials: "include" });
+    return fetch(API_BASE_URL + path + toQuery(query), { method, headers, body });
 }
 
 async function handle(response, { raw } = {}) {
